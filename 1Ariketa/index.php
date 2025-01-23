@@ -1,6 +1,6 @@
 <?php
 
-require_once("db.php");
+require_once("../db.php");
 
 $conn = konexioaSortu();
 
@@ -51,20 +51,21 @@ $result = $conn->query($kontsulta);
                     echo "<td>" . $row["Izena"] . "</td>";
                     echo "</tr>";
                 }
-
-                ?>
-            </tbody>
-        </table>
-        <br>
-        <button class="eguneratu">Eguneratu</button>
-        <?php
-
             } else {
                 echo "Ez dago informaziorik";
             }
             $conn->close();
 
             ?>
+        </tbody>
+    </table>
+    <br>
+    <button class="eguneratu">Eguneratu</button>
+    <?php
+
+
+
+    ?>
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
@@ -74,40 +75,46 @@ $result = $conn->query($kontsulta);
 
             $(".eguneratu").on("click", function () {
                 taulaBirkargatu();
-            });
 
-        }
+            });
+            
+            setInterval(taulaBirkargatu, 1000);
+
+        });
 
         function taulaBirkargatu() {
 
-                $.ajax({
-                    "url": "gidariak.php",
-                    "method": "GET",
-                    "data": {
-                        "akzioa": "lortugidariak",
-                    }
-                });
-                .done function(lortutakoInformazioa) {
+            $.ajax({
+                "url": "gidariak.php",
+                "method": "GET",
+                "data": {
+                    "akzioa": "lortugidariak",
+                }
+            })
+
+                .done(function (lortutakoInformazioa) {
+
                     var informazioa = JSON.parse(lortutakoInformazioa);
-                    if (informazioa.kopurua >0) {
-                        $("table").html("");
-                       
-                       
-                       
-                       
-                        for (var i; i<informazioa.kopurua;i++) {
-                            //.html izan behar da, seguro?
-                            $("table").html("<tr><td>"+ )
+                    if (informazioa.kopurua > 0) {
+                        $("tbody").html("");
+
+                        for (var i = 0; i < informazioa.kopurua; i++) {
+
+                            $("tbody").append("<tr><td>" + informazioa[i].postua + "</td><td>" + informazioa[i].dortsala + "</td><td>" + informazioa[i].izena + "</td></tr>");
+
                         }
                     } else {
-                        alert("Ez da informaziorik aurkitu");
-                    }
-                }
-                .fail function() {
-                    alert("Konexio arazoak");
-                }
 
-            }
+                        alert("Ez da informaziorik aurkitu");
+
+                    }
+
+                })
+                .fail(function () {
+                    alert("Gaizki joan da!");
+                });
+
+        }
     </script>
 
 </body>

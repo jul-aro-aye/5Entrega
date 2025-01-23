@@ -1,6 +1,6 @@
 <?php
 
-require_once("db.php");
+require_once("../db.php");
 
 if ($_GET["akzioa"] == "lortuIkasleak") {
 
