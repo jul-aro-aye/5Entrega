@@ -1,122 +1,137 @@
-<?php
+<?php // php etiketa ireki du
 
+// Datu basearekin egiteko konexioa egingo duen fitxategira deitzen du
 require_once("../db.php");
 
+// Datu-basearekin konektatzeko funtzioa exekutatzen du
 $conn = konexioaSortu();
 
-?>
+?> <!-- php etiketa itxi du -->
+<br> <!-- Ilara saltoa egiten du -->
+<?php // php etiketa ireki du
 
-<br>
-
-<?php
-
-$kontsulta = "SELECT Postua, Dortsala, Izena FROM 8ataza Order by Postua";
+// kontsulta gidarien egoera lortzeko postu bidez ordenatuta
+$kontsulta = "SELECT Postua, Dortsala, Izena FROM gidariak Order by Postua";
+// SQL kontsulta exekutatzen du
 $result = $conn->query($kontsulta);
-?>
+?> <!-- php etiketa itxi du -->
 
-<head>
+<head> <!-- Head etiketa irekitzen du -->
     <style>
+        /* Style etiketa ireki du */
+        /* Taula th eta td selektoreak aukeratu */
         table,
         th,
         td {
             border: 1px solid black;
+            /* Bordea definitzen du */
             border-collapse: collapse;
+            /* Bordeak batu egiten dira */
         }
 
         th,
         td {
             text-align: center;
+            /* Testua erdian kokatzen dugu */
         }
-    </style>
-</head>
+    </style> <!-- Style etiketa itxi du -->
+</head> <!-- Head etiketa itxi du -->
 
-<body>
+<body> <!-- Body etiketa ireki du -->
 
     <table>
-        <thead>
-            <tr>
+
+        <thead> <!-- Taularen head etiketa ireki du -->
+            <tr> <!-- Taulako hasiera zutabeak definitzen ditugu -->
                 <th>Postua</th>
                 <th>Dortsala</th>
                 <th>Izena</th>
             </tr>
-        </thead>
-        <tbody>
+        </thead> <!-- Taularen head etiketa itxi du -->
+        <tbody> <!-- Taularen body etiketa ireki du -->
             <?php
+            // SQL kontsultak emaitzarik eman duen ala ez konprobatzen dugu
             if ($result->num_rows > 0) {
 
+                // bukle bat emaitza guztiei eragiten diona
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["Postua"] . "</td>";
-                    echo "<td>" . $row["Dortsala"] . "</td>";
-                    echo "<td>" . $row["Izena"] . "</td>";
+                    echo "<td>" . $row["Postua"] . "</td>"; // Postuaren datua sartuko dugu
+                    echo "<td>" . $row["Dortsala"] . "</td>"; // Dortsalaren datua sartuko dugu
+                    echo "<td>" . $row["Izena"] . "</td>"; // Izenaren datua sartuko dugu
                     echo "</tr>";
                 }
             } else {
+                // Kondizioa betetzen ez denean exekutatuko da
                 echo "Ez dago informaziorik";
             }
+            // Datu-basea konexioa itxi du
             $conn->close();
 
             ?>
-        </tbody>
-    </table>
-    <br>
+        </tbody> <!-- Taularen body etiketa itxi du -->
+    </table> <!-- Taularen etiketa itxi du -->
+    <br> <!-- Ilara saltoa -->
+    <!-- Eguneratzeko botoia sortu dugu -->
     <button class="eguneratu">Eguneratu</button>
-    <?php
 
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script> <!-- jquery liburutegiari dei egiten dio -->
 
+    <script> //Script etiketa ireki du
 
-    ?>
+        $(document).ready(function () { // Dokumentua kargatzean egingo duen kodea
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-
-    <script>
-
-        $(document).ready(function () {
-
+            // Eguneratu botoia klik egitean taula kargatzeko funtzioa
             $(".eguneratu").on("click", function () {
-                taulaBirkargatu();
+                taulaBirkargatu(); // taulaBirkargatu funtzioari deitzen dio, taula eguneratzen duena
 
             });
-            
-            setInterval(taulaBirkargatu, 1000);
+
+            // Taula 1 minuturo automatikoki berriz kargatzeko kodea
+            setInterval(taulaBirkargatu, 60000);
 
         });
 
+        // Taula birkargatzeko funtzioa
         function taulaBirkargatu() {
 
+            // Ajax eskaera bat egiten dugu taulak automatikoki eguneratzeko
             $.ajax({
-                "url": "gidariak.php",
-                "method": "GET",
+                "url": "gidariak.php", // gidariak.php fitxategira egiten du eskaera
+                "method": "GET", // Eskaera GET metodoarekin egiten da
                 "data": {
-                    "akzioa": "lortugidariak",
+                    "akzioa": "lortugidariak", // Akzioa definitzen dugu
                 }
             })
 
-                .done(function (lortutakoInformazioa) {
+                .done(function (lortutakoInformazioa) { // Ongi joan bada lortutakoInformazioa funtzioa egingo du
+                    // Eskaera amaitzen denean, kontsulta jasotzen da JSON formatuan
+                    var informazioa = JSON.parse(lortutakoInformazioa); // Textu formatua JSON formatura parsatzen du
 
-                    var informazioa = JSON.parse(lortutakoInformazioa);
+                    // Erantzunik badago taula berriro beteko dugu
                     if (informazioa.kopurua > 0) {
+                        // Taula garbitzeko kodea
                         $("tbody").html("");
 
+                        // Bukle bat erantzun kopuru bakoitzeko exekutatuko dena
                         for (var i = 0; i < informazioa.kopurua; i++) {
-
+                            // Taularen ilara bakoitza betetzeko kodea, append erabiliz azkenaren amaieran idatziko
                             $("tbody").append("<tr><td>" + informazioa[i].postua + "</td><td>" + informazioa[i].dortsala + "</td><td>" + informazioa[i].izena + "</td></tr>");
-
                         }
                     } else {
-
+                        // Datuak ez badira, alerta bat erakusten dugu
                         alert("Ez da informaziorik aurkitu");
-
                     }
 
                 })
                 .fail(function () {
+                    // Ajax eskaera huts egin badu, alert bat erakusten dugu
                     alert("Gaizki joan da!");
                 });
 
         }
-    </script>
+    </script> <!-- Script etiketa itxi du -->
 
-</body>
+</body> <!-- Body etiketa itxi du -->
 
-</html>
+</html> <!-- Html etiketa itxi du -->
